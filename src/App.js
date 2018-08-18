@@ -15,8 +15,8 @@ class App extends Component {
         initial: 1,
         game: [{move:0,groups:[]}],
         koCheck: [0],
-
   }
+
     checkKoOrSuicide(key){
       let move = this.state.game[this.state.game.length]
       let color
@@ -31,7 +31,7 @@ class App extends Component {
       } else{
         color = "whitestone"
       }
-      if(this.CheckLife(key)){
+      if(!this.CheckLife(key)){
         alert("illegal suicide move")
         return false
       }
@@ -40,10 +40,10 @@ class App extends Component {
 
     checkIfStoneAlreadyThere(key)
     { 
-      if(this.state.board.getValueOfId(key) === "blackstone" || this.state.board.getValueOfId(key)  === "whitestone")
+      if(this.state.board.getValueOfID(key) === "blackstone" || this.state.board.getValueOfID(key)  === "whitestone")
       {
        
-        console.log(this.state.board.getValueOfId(key), "Stone is already there") 
+        console.log(this.state.board.getValueOfID(key), "Stone is already there") 
         return true;
       }
       else
@@ -53,19 +53,19 @@ class App extends Component {
     }
     DeleteGroup(array){
           console.log("Deleted group", array)
-          var i = this.state.game
-          console.log(this.state.game)
-          i[this.state.turn - 1].groups.push(array)
-          this.setState({i});
-          this.state.board.destroyChainfromID(array);
+         // var i = this.state.game
+          // console.log(this.state.game)
+         // i[this.state.turn - 1].groups.push(array)
+         // this.setState({i});
+          this.state.board.destroyChainFromID(array);
      }
     CreateGroup(key){
         var group = [];
-        if(this.state.board.getValueOfId(key)=== null || this.state.board.getValueOfId(key)=== undefined || this.state.board.getValueOfId(key)=== "empty"){
+        if(this.state.board.getValueOfID(key)=== null || this.state.board.getValueOfID(key)=== undefined || this.state.board.getValueOfID(key)=== "empty"){
           return [0]
         }
-        console.log(this.state.board.getChainfromID(key), "OBJECT")
-        var i = this.state.board.getChainfromID(key)
+        console.log(this.state.board.getChainFromID(key), "OBJECT")
+        var i = this.state.board.getChainFromID(key)
         i.forEach(entry => {
           group.push(entry);
         })
@@ -74,14 +74,18 @@ class App extends Component {
       }
       
     GlobalCheck (key){
-      this.CheckBoard(key);
       this.DisplayStone (key);
-      this.CreateGroup(key);
+      this.CheckBoard(key);
+      
     }
 
     CheckLife(key){
+      console.log("CheckLife")
+      if(this.state.board.getValueOfID(key) !== "blackstone" && this.state.board.getValueOfID(key) !== "whitestone"){
+        return true
+      }
       var group = this.CreateGroup(key);
-      console.log("check life")
+      console.log("Group create", group)
       group.forEach(entry => {
         console.log(entry)
         console.log(this.CheckLifeUp(entry), this.CheckLifeDown(entry), this.CheckLifeLeft(entry), this.CheckLifeRight(entry))
@@ -93,70 +97,59 @@ class App extends Component {
     }
     CheckLifeLeft(key){
       var i = this.state.board.getWestNeighbor(key)
-      console.log(i)
-      console.log(this.state.board.getValueOfId(key))
-      if(this.state.board.getValueOfId(key) === "empty"|| this.state.board.getValueOfId(key)=== null|| this.state.board.getValueOfId(key)=== undefined){
+      if(this.state.board.getValueOfID(i) !== "blackstone" && this.state.board.getValueOfID(i) !== "whitestone"){
         return true
       }
       return false;
     }
     CheckLifeRight(key){
       var i = this.state.board.getEastNeighbor(key)
-      console.log(i)
-      console.log(this.state.board.getValueOfId(key))
-      if(this.state.board.getValueOfId(key)=== "empty"|| this.state.board.getValueOfId(key)=== null || this.state.board.getValueOfId(key)=== undefined){
+      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
         return true
       }
       return false;
     }
     CheckLifeDown(key){
       var i = this.state.board.getSouthNeighbor(key)
-      console.log(i)
-      console.log(this.state.board.getValueOfId(key))
-      if(this.state.board.getValueOfId(key)=== "empty"|| this.state.board.getValueOfId(key)=== null || this.state.board.getValueOfId(key)=== undefined){
+      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
         return true
       }
       return false;
     }
     CheckLifeUp(key){
       var i = this.state.board.getNorthNeighbor(key)
-      console.log(i)
-      console.log(this.state.board.getValueOfId(i))
-      if(this.state.board.getValueOfId(i)=== "empty" || this.state.board.getValueOfId(i)=== null || this.state.board.getValueOfId(i)=== undefined){
+      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
         return true
       }
       return false;
     }
 
-    CheckIfOppositeColor(key, Color){
-      if(this.state.board.getValueOfId(key) === Color || this.state.board.getValueOfId(key) === "empty" || this.state.board.getValueOfId(key) === null){
-        return true
-      }
-      return false
-    }
-
     CheckBoard(key) { 
         var i = this.state.board.getNorthNeighbor(key)
-        console.log(this.state.board.getValueOfId(i))
+        console.log("Is it alive:", this.CheckLife(i), "North")
         if(!this.CheckLife(i)){
+          console.log("deleted South group")
           this.DeleteGroup(i)
         }
       
          i = this.state.board.getSouthNeighbor(key)
-        console.log(this.state.board.getValueOfId(i))
+        console.log("Is it alive:", this.CheckLife(i), "South")
         if(!this.CheckLife(i)){
           this.DeleteGroup(i)
+          console.log("deleted South group")
         }
      
         i = this.state.board.getWestNeighbor(key)
-        console.log(this.state.board.getValueOfId(i))
+        console.log("Is it alive:", this.CheckLife(i), "West")
         if(!this.CheckLife(i)){
+          console.log("deleted west group")
           this.DeleteGroup(i)
         }
      
          i = this.state.board.getEastNeighbor(key)
-        console.log(this.state.board.getValueOfId(i))
+        console.log("Is it alive:", this.CheckLife(i), "East")
             if(!this.CheckLife(i)){
+              console.log("deleted East group")
           this.DeleteGroup(i)
       }
     }
@@ -171,13 +164,13 @@ class App extends Component {
       }
 
      if(this.state.turn % 2 === 1){
-        this.state.board.setValueOfid(key, "blackstone")
+        this.state.board.setValueOfID(key, "blackstone")
         this.setState({
           state: "blackstone"  
         }) 
      }
      else{ if(this.state.turn % 2 === 0){
-        this.state.board.setValueOfid(key, "whitestone")
+        this.state.board.setValueOfID(key, "whitestone")
         this.setState({
           state: "whitestone"  
         }) 
@@ -197,11 +190,11 @@ class App extends Component {
                     {this.state.boardItterator.map(i => 
                     
                     <Square clickHandler={this.GlobalCheck.bind(this, i)}                                
-                          key={i}
-                          id={i}
-                          initial = {this.state.initial}
-                          value={this.state.board.getValueOfId(i)}
-                          style={this.state.board.getValueOfId(i)}  
+                          // key={i}
+                          // id={i}
+                          // initial = {this.state.initial}
+                          value={this.state.board.getValueOfID(i)}
+                          style={this.state.board.getValueOfID(i)}  
                     />
                     )}
         </div>
