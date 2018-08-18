@@ -2,6 +2,24 @@
   text-align: center;
 }
 
+/* .board-frame{
+  width: 50vw;
+  height: 50vw;
+  background-color: blueviolet;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+.board-size-19{
+  width: 50vw;
+  height: 50vw;
+  display: grid;
+  grid-template-columns: repeat(19, auto);
+  grid-template-columns: repeat(19, auto);
+  /* position: absolute; */
+}
+
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 80px;
@@ -25,4 +43,19 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+.square-empty{
+  text-align: center;
+  background-image: url("./components/square/background.png");
+  background-size: 100% 100%;
+}
+.square-blackstone{
+  text-align: center;
+  background-image: url("./components/square/blackstone.jpg");
+  background-size: 100% 100%;
+}
+.square-whitestone{ 
+  text-align: center;
+  background-image: url("./components/square/whitestone.png");
+  background-size: 100% 100%;
 }
