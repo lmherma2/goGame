@@ -34,7 +34,7 @@ class App extends Component {
           return false
         }
       }
-      if(this.CheckLife(key)){
+      if(!this.CheckLife(key)){
         alert("illegal suicide move")
         this.state.board.setValueOfID(key,"empty")
         return false
@@ -71,7 +71,6 @@ class App extends Component {
         i.forEach(entry => {
           group.push(entry);
         }) 
-        console.log(group, "GROUP")
         return group
       }
       
@@ -82,7 +81,7 @@ class App extends Component {
     }
 
     CheckLife(key){
-      //debugger;
+      var bol = false;
       console.log("CheckLife")
       if(this.state.board.getValueOfID(key) !== "blackstone" && this.state.board.getValueOfID(key) !== "whitestone"){
         return true
@@ -97,12 +96,13 @@ class App extends Component {
             arr.forEach(i => {
               console.log(i, "is", this.CheckIfLiberty(i))
                 if(this.CheckIfLiberty(i)){
-                  console.log(i)
-                  return true;
+                  console.log(i, "A Liberty")
+                   bol = true;
                 }
             })
       })
-    return false
+      console.log("Check life returns ",bol)
+    return bol
     }
 
     CheckIfLiberty(i){
@@ -115,45 +115,30 @@ class App extends Component {
       return false;
     }
 
+
     CheckBoard(key) { 
         var i = this.state.board.getNorthNeighbor(key)
-        console.log(i);
-        if(i !== null || i !== undefined || i !== "empty"){
-        console.log("Is it alive:", this.CheckLife(i), "North")
-        if(!this.CheckLife(i)){
-          console.log("deleted North group")
-          this.DeleteGroup(i)
-        }
-      }
+        console.log(i)
+       if(!this.CheckLife(i)){
+         this.DeleteGroup(i)
+       }
          i = this.state.board.getSouthNeighbor(key)
-         console.log(i);
-         if(i !== null || i !== undefined || i !== "empty"){
-        console.log("Is it alive:", this.CheckLife(i), "South")
-        if(!this.CheckLife(i)){
-          this.DeleteGroup(i)
-          console.log("deleted South group")
-        }
-      }
-     
+         console.log(i)
+          if(!this.CheckLife(i)){
+         this.DeleteGroup(i)
+       }
         i = this.state.board.getWestNeighbor(key)
-        console.log(i);
-        if(i !== null || i !== undefined || i !== "empty"){
-        console.log("Is it alive:", this.CheckLife(i), "West")
+        console.log(i)
         if(!this.CheckLife(i)){
-          console.log("deleted west group")
-          this.DeleteGroup(i)
-        }
-      }
-        if(i !== null || i !== undefined || i !== "empty"){
+         this.DeleteGroup(i)
+       }
          i = this.state.board.getEastNeighbor(key)
-         console.log(i);
-        console.log("Is it alive:", this.CheckLife(i), "East")
-            if(!this.CheckLife(i)){
-              console.log("deleted East group")
-          this.DeleteGroup(i)
+         console.log(i)
+        if(!this.CheckLife(i)){
+         this.DeleteGroup(i)
+       }
+      
       }
-    }
-    }
   
     DisplayStone (key){ 
     if(!this.checkIfStoneAlreadyThere(key) && this.checkKoOrSuicide(key)){
