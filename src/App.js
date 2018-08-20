@@ -19,20 +19,24 @@ class App extends Component {
 
     checkKoOrSuicide(key){
       let move = this.state.game[this.state.game.length]
-      let color
-      if(move !== "pass"){
-        if(move === this.state.koCheck[0]){
-          alert("illegal Ko move")
-          return false
-        }
-      }
+      let color 
+      console.log(this.CheckLife(key), "is", key, "alive")
       if(this.turn%2 ===1){
         color = "blackstone"
       } else{
         color = "whitestone"
       }
-      if(!this.CheckLife(key)){
+      this.state.board.setValueOfID(key,color)
+      if(move !== "pass"){
+        if(move === this.state.koCheck[0]){
+          alert("illegal Ko move")
+          this.state.board.setValueOfID(key,"empty")
+          return false
+        }
+      }
+      if(this.CheckLife(key)){
         alert("illegal suicide move")
+        this.state.board.setValueOfID(key,"empty")
         return false
       }
       return true; 
@@ -41,9 +45,7 @@ class App extends Component {
     checkIfStoneAlreadyThere(key)
     { 
       if(this.state.board.getValueOfID(key) === "blackstone" || this.state.board.getValueOfID(key)  === "whitestone")
-      {
-       
-        console.log(this.state.board.getValueOfID(key), "Stone is already there") 
+      { 
         return true;
       }
       else
@@ -51,107 +53,102 @@ class App extends Component {
         return false;
       }
     }
-    DeleteGroup(array){
-          console.log("Deleted group", array)
-         // var i = this.state.game
-          // console.log(this.state.game)
-         // i[this.state.turn - 1].groups.push(array)
-         // this.setState({i});
-          this.state.board.destroyChainFromID(array);
+    DeleteGroup(key){
+          console.log("Deleted group", this.CreateGroup(key))
+          this.state.board.replaceChainFromID(key, "empty");
      }
     CreateGroup(key){
         var group = [];
         if(this.state.board.getValueOfID(key)=== null || this.state.board.getValueOfID(key)=== undefined || this.state.board.getValueOfID(key)=== "empty"){
-          return [0]
+          return []
         }
-        console.log(this.state.board.getChainFromID(key), "OBJECT")
+       
         var i = this.state.board.getChainFromID(key)
         i.forEach(entry => {
           group.push(entry);
-        })
-        console.log(group);
+        }) 
+        console.log(group, "GROUP")
         return group
       }
       
     GlobalCheck (key){
-      this.DisplayStone (key);
+      this.DisplayStone(key);
       this.CheckBoard(key);
       
     }
 
     CheckLife(key){
+      //debugger;
       console.log("CheckLife")
       if(this.state.board.getValueOfID(key) !== "blackstone" && this.state.board.getValueOfID(key) !== "whitestone"){
         return true
       }
       var group = this.CreateGroup(key);
-      console.log("Group create", group)
+      console.log("Group created", group)
+      if(group === []){
+        return false;
+      }
       group.forEach(entry => {
-        console.log(entry)
-        console.log(this.CheckLifeUp(entry), this.CheckLifeDown(entry), this.CheckLifeLeft(entry), this.CheckLifeRight(entry))
-        if(this.CheckLifeUp(entry) || this.CheckLifeDown(entry) || this.CheckLifeLeft(entry) || this.CheckLifeRight(entry)){
-          return true
-        }
-    })
+        var arr = this.state.board.getNeighbors(entry);
+            arr.forEach(i => {
+              console.log(i, "is", this.CheckIfLiberty(i))
+                if(this.CheckIfLiberty(i)){
+                  console.log(i)
+                  return true;
+                }
+            })
+      })
     return false
     }
-    CheckLifeLeft(key){
-      var i = this.state.board.getWestNeighbor(key)
+
+    CheckIfLiberty(i){
+      console.log(i, "is ", this.state.board.getValueOfID(i))
       if(this.state.board.getValueOfID(i) !== "blackstone" && this.state.board.getValueOfID(i) !== "whitestone"){
+        console.log(true)
         return true
       }
-      return false;
-    }
-    CheckLifeRight(key){
-      var i = this.state.board.getEastNeighbor(key)
-      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
-        return true
-      }
-      return false;
-    }
-    CheckLifeDown(key){
-      var i = this.state.board.getSouthNeighbor(key)
-      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
-        return true
-      }
-      return false;
-    }
-    CheckLifeUp(key){
-      var i = this.state.board.getNorthNeighbor(key)
-      if(this.state.board.getValueOfID(i) !== "blackstone"&& this.state.board.getValueOfID(i) !== "whitestone"){
-        return true
-      }
+      console.log(false)
       return false;
     }
 
     CheckBoard(key) { 
         var i = this.state.board.getNorthNeighbor(key)
+        console.log(i);
+        if(i !== null || i !== undefined || i !== "empty"){
         console.log("Is it alive:", this.CheckLife(i), "North")
         if(!this.CheckLife(i)){
-          console.log("deleted South group")
+          console.log("deleted North group")
           this.DeleteGroup(i)
         }
-      
+      }
          i = this.state.board.getSouthNeighbor(key)
+         console.log(i);
+         if(i !== null || i !== undefined || i !== "empty"){
         console.log("Is it alive:", this.CheckLife(i), "South")
         if(!this.CheckLife(i)){
           this.DeleteGroup(i)
           console.log("deleted South group")
         }
+      }
      
         i = this.state.board.getWestNeighbor(key)
+        console.log(i);
+        if(i !== null || i !== undefined || i !== "empty"){
         console.log("Is it alive:", this.CheckLife(i), "West")
         if(!this.CheckLife(i)){
           console.log("deleted west group")
           this.DeleteGroup(i)
         }
-     
+      }
+        if(i !== null || i !== undefined || i !== "empty"){
          i = this.state.board.getEastNeighbor(key)
+         console.log(i);
         console.log("Is it alive:", this.CheckLife(i), "East")
             if(!this.CheckLife(i)){
               console.log("deleted East group")
           this.DeleteGroup(i)
       }
+    }
     }
   
     DisplayStone (key){ 
