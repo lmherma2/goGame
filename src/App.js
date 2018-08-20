@@ -54,6 +54,10 @@ class App extends Component {
       }
     }
     DeleteGroup(key){
+          if(this.state.board.getValueOfID(key)!== "blackstone" && this.state.board.getValueOfID(key)!=="whitestone"){
+            console.log("Deleted group was ", this.state.board.getValueOfID(key))
+            return;
+          }
           console.log("Deleted group", this.CreateGroup(key))
           this.state.board.replaceChainFromID(key, "empty");
      }
