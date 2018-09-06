@@ -5,6 +5,7 @@ import Matrix from 'matrix-map';
 import Square from './components/square/square.jsx'
 // import Gameboard from './components/index.js'
 let gameBoard = new Matrix(361);
+
 class App extends Component {
   state = {
         turn: 1,
@@ -17,14 +18,15 @@ class App extends Component {
         GameBoard: [gameBoard],
         Groups: {},
         sendAlert: true,
+        response: '',
         koCheck: 0
   }
-    goBackAMove(){
-      if(this.state.turn > 1){
-      this.setState({board: this.state.GameBoard[this.state.GameBoard.length-1]})
-      }
-    // this.DisplayStone(0);
-    }
+
+  componentDidMount() {
+    this.callApi()
+      .then(res => this.setState({ response: res.express }))
+      .catch(err => console.log(err));
+  }
 
     checkKoOrSuicide(key){
       var bol = true
@@ -99,7 +101,15 @@ class App extends Component {
       
 
     GlobalCheck (key){
-      this.DisplayStone(key);    
+      this.DisplayStone(key);
+      this.CheckIfGameIsOver();
+    }
+
+    CheckIfGameIsOver(){
+      var moves = this.state.moves;
+      if(moves[moves.length]=== "pass" && moves[moves.length-1]=== "pass"){
+        alert("Games Over")
+      }
     }
 
     CheckLife(key){
@@ -134,6 +144,23 @@ class App extends Component {
       }
       return bol;
     }
+
+    pass(){
+      var move = this.state.moves
+      move.push("pass")
+      this.setState({moves : move})
+      var k = this.state.turn + 1 
+      this.setState({turn: k})
+    }
+
+    callApi = async () => {
+      const response = await fetch('/');
+      const body = await response.json();
+  
+      if (response.status !== 200) throw Error(body.message);
+  
+      return body;
+    };
 
 
     CheckBoard(key) { 
@@ -208,9 +235,10 @@ class App extends Component {
                     )}
         </div>
       </div>
-      <button onClick={() => {this.goBackAMove() }}>
-             Go Back A Move
+      <button className="middle" onClick={() => {this.pass() }}>
+             Pass
       </button>
+      <p className="Games">{this.state.response}</p>
     </div>
     );
   };
